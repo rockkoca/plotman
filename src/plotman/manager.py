@@ -97,10 +97,19 @@ def maybe_start_new_plot(dir_cfg, sched_cfg, plotting_cfg):
             tmpdir = max(rankable, key=operator.itemgetter(1))[0]
 
             # Select the dst dir least recently selected
-            dir2ph = { d:ph for (d, ph) in dstdirs_to_youngest_phase(jobs).items()
-                      if d in dir_cfg.dst and ph is not None}
-            unused_dirs = [d for d in dir_cfg.dst if d not in dir2ph.keys()]
-            dstdir = ''
+            dir2ph = {d: ph for (d, ph) in dstdirs_to_youngest_phase(jobs).items()
+                      if (d in dir_cfg.dst and plot_util.is_valid_plot_dst(d, sched_cfg, jobs))}
+            unused_dirs = [d for d in dir_cfg.dst
+                           if d not in dir2ph.keys() and plot_util.is_valid_plot_dst(d, sched_cfg, jobs)]
+
+            if not unused_dirs and not dir2ph:
+                wait_reason = 'no eligible dstdirs'
+            elif not eligible:
+                wait_reason = 'no eligible tempdirs'
+            else:
+                # Plot to oldest tmpdir.
+                tmpdir = max(rankable, key=operator.itemgetter(1))[0]
+
             if unused_dirs: 
                 dstdir = random.choice(unused_dirs)
             else:
