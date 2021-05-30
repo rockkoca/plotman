@@ -333,6 +333,7 @@ def run_interactive():
     try:
         curses.wrapper(curses_main)
     except curses.error as e:
-        raise TerminalTooSmallError(
-            "Your terminal may be too small, try making it bigger.",
-        ) from e
+        print("Your terminal may be too small, try making it bigger.")
+        # raise TerminalTooSmallError(
+        #     "Your terminal may be too small, try making it bigger.",
+        # ) from e
