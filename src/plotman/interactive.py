@@ -12,6 +12,7 @@ from plotman.job import Job
 class TerminalTooSmallError(Exception):
     pass
 
+
 class Log:
     def __init__(self):
         self.entries = []
@@ -40,18 +41,20 @@ class Log:
 
     def cur_slice(self, num_entries):
         '''Return num_entries log entries up to the current slice position'''
-        return self.entries[max(0, self.cur_pos - num_entries) : self.cur_pos]
+        return self.entries[max(0, self.cur_pos - num_entries): self.cur_pos]
 
     def fill_log(self):
         '''Add a bunch of stuff to the log.  Useful for testing.'''
         for i in range(100):
             self.log('Log line %d' % i)
 
+
 def plotting_status_msg(active, status):
     if active:
         return '(active) ' + status
     else:
         return '(inactive) ' + status
+
 
 def archiving_status_msg(configured, active, status):
     if configured:
@@ -61,6 +64,7 @@ def archiving_status_msg(configured, active, status):
             return '(inactive) ' + status
     else:
         return '(not configured)'
+
 
 def curses_main(stdscr):
     log = Log()
@@ -73,7 +77,7 @@ def curses_main(stdscr):
     archiving_configured = cfg.directories.archive is not None
     archiving_active = archiving_configured
 
-    plotting_status = '<startup>'    # todo rename these msg?
+    plotting_status = '<startup>'  # todo rename these msg?
     archiving_status = '<startup>'
 
     stdscr.nodelay(True)  # make getch() non-blocking
@@ -88,7 +92,7 @@ def curses_main(stdscr):
     jobs = Job.get_running_jobs(cfg.directories.log)
     last_refresh = None
 
-    pressed_key = ''   # For debugging
+    pressed_key = ''  # For debugging
 
     archdir_freebytes = None
     aging_reason = None
@@ -99,11 +103,11 @@ def curses_main(stdscr):
         # scratch (i.e., reread their logfiles).  Otherwise we'll only
         # initialize new jobs, and mostly rely on cached info.
         do_full_refresh = False
-        elapsed = 0    # Time since last refresh, or zero if no prev. refresh
+        elapsed = 0  # Time since last refresh, or zero if no prev. refresh
         if last_refresh is None:
             do_full_refresh = True
         else:
-            elapsed = (datetime.datetime.now() - last_refresh).total_seconds() 
+            elapsed = (datetime.datetime.now() - last_refresh).total_seconds()
             do_full_refresh = elapsed >= cfg.scheduling.polling_time_s
 
         if not do_full_refresh:
@@ -137,7 +141,6 @@ def curses_main(stdscr):
                         log.log(log_message)
 
                 archdir_freebytes = archive.get_archdir_freebytes(cfg.directories.archive)
-
 
         # Get terminal size.  Recommended method is stdscr.getmaxyx(), but this
         # does not seem to work on some systems.  It may be a bug in Python
@@ -189,7 +192,7 @@ def curses_main(stdscr):
         #
         # Layout
         #
-            
+
         tmp_h = len(tmp_report.splitlines())
         tmp_w = len(max(tmp_report.splitlines(), key=len)) + 1
         dst_h = len(dst_report.splitlines())
@@ -219,7 +222,7 @@ def curses_main(stdscr):
             dirs_win = curses.newwin(dirs_h, n_cols, dirs_pos, 0)
         except Exception:
             ...
-            #no raise
+            # no raise
             # raise Exception('Failed to initialize curses windows, try a larger '
             #                 'terminal window.')
 
@@ -234,11 +237,11 @@ def curses_main(stdscr):
         header_win.addnstr(f" {timestamp} (refresh {refresh_msg})", linecap)
         header_win.addnstr('  |  <P>lotting: ', linecap, curses.A_BOLD)
         header_win.addnstr(
-                plotting_status_msg(plotting_active, plotting_status), linecap)
+            plotting_status_msg(plotting_active, plotting_status), linecap)
         header_win.addnstr(' <A>rchival: ', linecap, curses.A_BOLD)
         header_win.addnstr(
-                archiving_status_msg(archiving_configured,
-                    archiving_active, archiving_status), linecap) 
+            archiving_status_msg(archiving_configured,
+                                 archiving_active, archiving_status), linecap)
 
         # Oneliner progress display
         header_win.addnstr(1, 0, 'Jobs (%d): ' % len(jobs), linecap)
@@ -247,7 +250,7 @@ def curses_main(stdscr):
         # These are useful for debugging.
         # header_win.addnstr('  term size: (%d, %d)' % (n_rows, n_cols), linecap)  # Debuggin
         # if pressed_key:
-            # header_win.addnstr(' (keypress %s)' % str(pressed_key), linecap)
+        # header_win.addnstr(' (keypress %s)' % str(pressed_key), linecap)
         header_win.addnstr(2, 0, 'Prefixes:', linecap, curses.A_BOLD)
         header_win.addnstr('  tmp=', linecap, curses.A_BOLD)
         header_win.addnstr(tmp_prefix, linecap)
@@ -257,11 +260,10 @@ def curses_main(stdscr):
             header_win.addnstr('  archive=', linecap, curses.A_BOLD)
             header_win.addnstr(arch_prefix, linecap)
         header_win.addnstr(' (remote)', linecap)
-        
 
         # Jobs
-        jobs_win.addstr(0, 0, reporting.status_report(jobs, n_cols, jobs_h, 
-            tmp_prefix, dst_prefix))
+        jobs_win.addstr(0, 0, reporting.status_report(jobs, n_cols, jobs_h,
+                                                      tmp_prefix, dst_prefix))
         jobs_win.chgat(0, 0, curses.A_REVERSE)
 
         # Dirs
@@ -270,14 +272,14 @@ def curses_main(stdscr):
         maxtd_h = max([tmp_h, dst_h])
 
         tmpwin = curses.newwin(
-                    tmp_h, tmp_w,
-                    dirs_pos + int(maxtd_h - tmp_h), 0)
+            tmp_h, tmp_w,
+            dirs_pos + int(maxtd_h - tmp_h), 0)
         tmpwin.addstr(tmp_report)
         tmpwin.chgat(0, 0, curses.A_REVERSE)
 
         dstwin = curses.newwin(
-                dst_h, dst_w,
-                dirs_pos + int((maxtd_h - dst_h) / 2), tmp_w + tmpwin_dstwin_gutter)
+            dst_h, dst_w,
+            dirs_pos + int((maxtd_h - dst_h) / 2), tmp_w + tmpwin_dstwin_gutter)
         dstwin.addstr(dst_report)
         dstwin.chgat(0, 0, curses.A_REVERSE)
 
@@ -287,8 +289,8 @@ def curses_main(stdscr):
 
         # Log.  Could use a pad here instead of managing scrolling ourselves, but
         # this seems easier.
-        log_win.addnstr(0, 0, ('Log: %d (<up>/<down>/<end> to scroll)\n' % log.get_cur_pos() ),
-                linecap, curses.A_REVERSE)
+        log_win.addnstr(0, 0, ('Log: %d (<up>/<down>/<end> to scroll)\n' % log.get_cur_pos()),
+                        linecap, curses.A_REVERSE)
         for i, logline in enumerate(log.cur_slice(logs_h - 1)):
             log_win.addnstr(i + 1, 0, logline, linecap)
 
@@ -331,11 +333,13 @@ def run_interactive():
     locale.setlocale(locale.LC_ALL, '')
     code = locale.getpreferredencoding()
     # Then use code as the encoding for str.encode() calls.
-
-    try:
-        curses.wrapper(curses_main)
-    except curses.error as e:
-        print("Your terminal may be too small, try making it bigger.")
-        # raise TerminalTooSmallError(
-        #     "Your terminal may be too small, try making it bigger.",
-        # ) from e
+    while True:
+        try:
+            curses.wrapper(curses_main)
+        except curses.error as e:
+            print("Your terminal may be too small, try making it bigger.")
+            # raise TerminalTooSmallError(
+            #     "Your terminal may be too small, try making it bigger.",
+            # ) from e
+        except KeyboardInterrupt:
+            exit(0)
