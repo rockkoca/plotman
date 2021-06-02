@@ -218,8 +218,10 @@ def curses_main(stdscr):
             jobs_win = curses.newwin(jobs_h, n_cols, jobs_pos, 0)
             dirs_win = curses.newwin(dirs_h, n_cols, dirs_pos, 0)
         except Exception:
-            raise Exception('Failed to initialize curses windows, try a larger '
-                            'terminal window.')
+            ...
+            #no raise
+            # raise Exception('Failed to initialize curses windows, try a larger '
+            #                 'terminal window.')
 
         #
         # Write
