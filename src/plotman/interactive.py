@@ -4,6 +4,7 @@ import locale
 import math
 import os
 import subprocess
+import time
 
 from plotman import archive, configuration, manager, reporting
 from plotman.job import Job
@@ -221,10 +222,8 @@ def curses_main(stdscr):
             jobs_win = curses.newwin(jobs_h, n_cols, jobs_pos, 0)
             dirs_win = curses.newwin(dirs_h, n_cols, dirs_pos, 0)
         except Exception:
-            ...
-            # no raise
-            # raise Exception('Failed to initialize curses windows, try a larger '
-            #                 'terminal window.')
+            raise Exception('Failed to initialize curses windows, try a larger '
+                            'terminal window.')
 
         #
         # Write
@@ -341,5 +340,6 @@ def run_interactive():
             # raise TerminalTooSmallError(
             #     "Your terminal may be too small, try making it bigger.",
             # ) from e
+            time.sleep(5)
         except KeyboardInterrupt:
             exit(0)
